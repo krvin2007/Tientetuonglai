@@ -1,0 +1,283 @@
+.page {
+  padding-top: calc(var(--header-height) + 40px);
+  min-height: 100vh;
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+.profileSection {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+}
+
+.profileCard {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-xl);
+  padding: 32px;
+  text-align: center;
+}
+
+.profileAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 auto 16px;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+}
+
+.profileName {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.profileVip {
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.profileWallet {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 16px;
+}
+
+.profileWalletLabel {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.profileWalletAddress {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.85rem;
+  color: var(--accent-blue-light);
+}
+
+.profileBalance {
+  padding: 16px;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  border-radius: var(--border-radius-md);
+}
+
+.profileBalanceLabel {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.profileBalanceValue {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent-blue-light);
+}
+
+.profileBalanceSUI {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.statCard {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 24px;
+  text-align: center;
+  transition: all var(--transition-base);
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-color-hover);
+}
+
+.statIcon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.statValue {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 4px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 10px 24px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.tab:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  background: var(--gradient-primary);
+  color: white !important;
+}
+
+/* Activity List */
+.activityCard {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background var(--transition-fast);
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityItem:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.activityIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.activityBid {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.activityWin {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.activitySell {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.activityInfo {
+  flex: 1;
+}
+
+.activityTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.activityMeta {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.activityAmount {
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: right;
+}
+
+.activityAmountPositive {
+  color: var(--accent-green);
+}
+
+.activityAmountNegative {
+  color: var(--accent-red);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-secondary);
+}
+
+.emptyIcon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 1024px) {
+  .profileSection {
+    grid-template-columns: 1fr;
+  }
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+  .tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+}

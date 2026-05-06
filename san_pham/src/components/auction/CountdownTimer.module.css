@@ -1,0 +1,120 @@
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.value {
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+.separator {
+  font-family: 'Space Grotesk', monospace;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  align-self: flex-start;
+}
+
+/* Size: sm */
+.sm .value {
+  width: 32px;
+  height: 28px;
+  font-size: 0.8rem;
+}
+
+.sm .label {
+  font-size: 0.55rem;
+}
+
+.sm .separator {
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* Size: md */
+.md .value {
+  width: 44px;
+  height: 38px;
+  font-size: 1rem;
+}
+
+.md .label {
+  font-size: 0.6rem;
+}
+
+.md .separator {
+  font-size: 1rem;
+  margin-top: 6px;
+}
+
+/* Size: lg */
+.lg .value {
+  width: 64px;
+  height: 56px;
+  font-size: 1.5rem;
+  border-radius: 10px;
+}
+
+.lg .label {
+  font-size: 0.7rem;
+}
+
+.lg .separator {
+  font-size: 1.5rem;
+  margin-top: 10px;
+}
+
+/* Urgent state */
+.urgent .value {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--accent-red);
+  animation: urgentPulse 1s ease-in-out infinite;
+}
+
+.urgent .separator {
+  color: var(--accent-red);
+}
+
+/* Ended state */
+.ended {
+  padding: 8px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 8px;
+}
+
+.endedText {
+  color: var(--accent-red);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+@keyframes urgentPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+  }
+}

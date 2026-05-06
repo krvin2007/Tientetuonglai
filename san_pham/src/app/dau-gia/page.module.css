@@ -1,0 +1,116 @@
+.page {
+  padding-top: calc(var(--header-height) + 40px);
+  min-height: 100vh;
+}
+
+.pageHeader {
+  max-width: var(--max-width);
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+
+.pageTitle {
+  font-size: 2.2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.pageSubtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: var(--max-width);
+  margin: 0 auto 24px;
+  padding: 0 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterChip {
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filterChip:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass-hover);
+  border-color: var(--border-color-hover);
+}
+
+.filterChipActive {
+  color: white !important;
+  background: var(--accent-blue) !important;
+  border-color: var(--accent-blue) !important;
+}
+
+.sortSelect {
+  padding: 8px 16px;
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.sortSelect option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.auctionGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+
+.resultsCount {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  max-width: var(--max-width);
+  margin: 0 auto 16px;
+  padding: 0 24px;
+}
+
+.resultsCount strong {
+  color: var(--text-primary);
+}
+
+@media (max-width: 1024px) {
+  .auctionGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .auctionGrid {
+    grid-template-columns: 1fr;
+  }
+  .pageTitle {
+    font-size: 1.6rem;
+  }
+}
