@@ -10,6 +10,14 @@ import styles from './page.module.css';
 
 export default function CreateAuctionPage() {
   const [duration, setDuration] = useState('3d');
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    categoryId: '',
+    startPrice: '',
+    minIncrement: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const durations = [
     { id: '1d', label: '1 Ngày' },
@@ -17,6 +25,27 @@ export default function CreateAuctionPage() {
     { id: '7d', label: '7 Ngày' },
     { id: '14d', label: '14 Ngày' },
   ];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (!formData.title || !formData.startPrice || !formData.categoryId) {
+      alert('Vui lòng điền đầy đủ các thông tin bắt buộc');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // Simulate blockchain transaction
+    setTimeout(() => {
+      setIsSubmitting(false);
+      alert('Tạo phiên đấu giá thành công! Sản phẩm của bạn đã được đưa lên SUI Blockchain và đang chờ người tham gia.');
+      window.location.href = '/dau-gia';
+    }, 2000);
+  };
 
   return (
     <>
@@ -52,8 +81,11 @@ export default function CreateAuctionPage() {
               </label>
               <input
                 type="text"
+                name="title"
                 className={styles.formInput}
                 placeholder="VD: Máy Pha Cà Phê DeLonghi Magnifica"
+                value={formData.title}
+                onChange={handleInputChange}
               />
             </div>
 
@@ -63,8 +95,11 @@ export default function CreateAuctionPage() {
                 Mô tả chi tiết
               </label>
               <textarea
+                name="description"
                 className={`${styles.formInput} ${styles.formTextarea}`}
                 placeholder="Mô tả tình trạng, xuất xứ, đặc điểm nổi bật của sản phẩm..."
+                value={formData.description}
+                onChange={handleInputChange}
               />
             </div>
 
@@ -73,7 +108,12 @@ export default function CreateAuctionPage() {
               <label className={`${styles.formLabel} ${styles.formLabelRequired}`}>
                 Danh mục
               </label>
-              <select className={styles.formSelect}>
+              <select 
+                name="categoryId"
+                className={styles.formSelect}
+                value={formData.categoryId}
+                onChange={handleInputChange}
+              >
                 <option value="">Chọn danh mục</option>
                 {categories.map(cat => (
                   <option key={cat.id} value={cat.id}>
@@ -94,10 +134,13 @@ export default function CreateAuctionPage() {
                 <div className={styles.formInputGroup}>
                   <input
                     type="number"
+                    name="startPrice"
                     className={styles.formInput}
                     placeholder="0"
                     min="0"
                     step="0.1"
+                    value={formData.startPrice}
+                    onChange={handleInputChange}
                   />
                   <span className={styles.formInputSuffix}>SUI</span>
                 </div>
@@ -109,10 +152,13 @@ export default function CreateAuctionPage() {
                 <div className={styles.formInputGroup}>
                   <input
                     type="number"
+                    name="minIncrement"
                     className={styles.formInput}
                     placeholder="0.5"
                     min="0"
                     step="0.1"
+                    value={formData.minIncrement}
+                    onChange={handleInputChange}
                   />
                   <span className={styles.formInputSuffix}>SUI</span>
                 </div>
@@ -153,9 +199,14 @@ export default function CreateAuctionPage() {
 
             {/* Actions */}
             <div className={styles.formActions}>
-              <button className={styles.submitBtn} type="button">
+              <button 
+                className={`${styles.submitBtn} ${isSubmitting ? styles.submitBtnLoading : ''}`} 
+                type="button"
+                onClick={handleSubmit}
+                disabled={isSubmitting}
+              >
                 <Gavel size={18} />
-                Tạo Phiên Đấu Giá
+                {isSubmitting ? 'Đang tạo...' : 'Tạo Phiên Đấu Giá'}
               </button>
               <Link href="/" className={styles.cancelBtn}>
                 Hủy
