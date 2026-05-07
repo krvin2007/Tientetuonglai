@@ -62,6 +62,20 @@
   --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Facets Design System Colors */
+  --colorRgbFacetsTeal600: 2, 128, 125;
+  --colorRgbFacetsNeutralLight200: 233, 235, 237;
+  --colorRgbFacetsNeutralLight700: 53, 58, 62;
+  --colorRgbFacetsNeutralDark900: 6, 11, 16;
+  
+  --colorTealAction: rgb(var(--colorRgbFacetsTeal600));
+  --colorHr: rgb(var(--colorRgbFacetsNeutralLight200));
+  --colorGrayDarkest: rgb(var(--colorRgbFacetsNeutralLight700));
+  --colorGrayLighter: rgb(var(--colorRgbFacetsNeutralLight200));
+  --colorText: var(--colorGrayDarkest);
+  --effectShadowLightShallow: 0 1px 10px 0 rgba(53, 58, 62, 0.06), 
+                              0 2px 4px 0 rgba(53, 58, 62, 0.08);
 }
 
 /* ===== RESET & BASE ===== */

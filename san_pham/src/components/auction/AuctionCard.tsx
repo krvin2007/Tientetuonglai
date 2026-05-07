@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Gavel } from 'lucide-react';
 import CountdownTimer from './CountdownTimer';
@@ -13,6 +14,11 @@ interface AuctionCardProps {
 
 export default function AuctionCard({ auction }: AuctionCardProps) {
   const category = categories.find(c => c.id === auction.categoryId);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <Link href={`/dau-gia/${auction.id}`} className={`${styles.card} ${auction.hotDeal ? styles.cardHot : ''}`}>
@@ -56,7 +62,7 @@ export default function AuctionCard({ auction }: AuctionCardProps) {
         <div className={styles.priceRow}>
           <div className={styles.priceSection}>
             <span className={styles.priceLabel}>Giá hiện tại</span>
-            <span className={styles.priceValue}>{auction.currentPrice.toLocaleString('vi-VN')} SUI</span>
+            <span className={styles.priceValue}>{isMounted ? auction.currentPrice.toLocaleString('vi-VN') : '...'} SUI</span>
             <span className={styles.startPrice}>Khởi điểm: {auction.startPrice} SUI</span>
           </div>
         </div>

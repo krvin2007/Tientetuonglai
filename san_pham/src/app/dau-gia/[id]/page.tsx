@@ -18,6 +18,11 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
   const category = categories.find(c => c.id === auction?.categoryId);
 
   const [bidAmount, setBidAmount] = useState('');
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   if (!auction) {
     return (
@@ -109,7 +114,7 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                   <div className={styles.metaItem}>
                     <div className={styles.metaLabel}>Bắt đầu</div>
-                    <div className={styles.metaValue}>{formatDate(auction.startTime)}</div>
+                    <div className={styles.metaValue}>{isMounted ? formatDate(auction.startTime) : '...'}</div>
                   </div>
                 </div>
               </div>
@@ -128,7 +133,7 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
                       </div>
                       <div className={styles.historyBidder}>
                         <div className={styles.historyBidderName}>{bid.bidder.name}</div>
-                        <div className={styles.historyTime}>{formatRelativeTime(bid.timestamp)}</div>
+                        <div className={styles.historyTime}>{isMounted ? formatRelativeTime(bid.timestamp) : '...'}</div>
                       </div>
                       <div className={styles.historyAmount}>{bid.amount.toLocaleString('vi-VN')} SUI</div>
                     </div>

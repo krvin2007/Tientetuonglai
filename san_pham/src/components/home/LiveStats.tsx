@@ -1,7 +1,16 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { platformStats } from '@/lib/mock-data';
 import styles from './LiveStats.module.css';
 
 export default function LiveStats() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -17,7 +26,7 @@ export default function LiveStats() {
             <div className={styles.stat}>
               <span className={styles.statIcon}>📊</span>
               <span className={`${styles.statValue} ${styles.blueValue}`}>
-                {platformStats.totalAuctions.toLocaleString()}
+                {isMounted ? platformStats.totalAuctions.toLocaleString() : '...'}
               </span>
               <span className={styles.statLabel}>Tổng phiên đấu giá</span>
             </div>
@@ -25,7 +34,7 @@ export default function LiveStats() {
             <div className={styles.stat}>
               <span className={styles.statIcon}>👥</span>
               <span className={`${styles.statValue} ${styles.purpleValue}`}>
-                {platformStats.totalUsers.toLocaleString()}
+                {isMounted ? platformStats.totalUsers.toLocaleString() : '...'}
               </span>
               <span className={styles.statLabel}>Người dùng</span>
             </div>

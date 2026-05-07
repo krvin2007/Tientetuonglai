@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Gavel, Plus } from 'lucide-react';
 import CountdownTimer from '@/components/auction/CountdownTimer';
@@ -8,6 +9,11 @@ import styles from './HeroSection.module.css';
 
 export default function HeroSection() {
   const spotlightAuction = auctions[1]; // Dragon Lore - most exciting
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   return (
     <section className={styles.hero} id="hero">
@@ -44,13 +50,13 @@ export default function HeroSection() {
           <div className={styles.heroStats}>
             <div className={styles.heroStat}>
               <span className={styles.heroStatValue}>
-                {platformStats.totalAuctions.toLocaleString('vi-VN')}
+                {isMounted ? platformStats.totalAuctions.toLocaleString('vi-VN') : '...'}
               </span>
               <span className={styles.heroStatLabel}>Phiên đấu giá</span>
             </div>
             <div className={styles.heroStat}>
               <span className={styles.heroStatValue}>
-                {platformStats.totalUsers.toLocaleString('vi-VN')}
+                {isMounted ? platformStats.totalUsers.toLocaleString('vi-VN') : '...'}
               </span>
               <span className={styles.heroStatLabel}>Người dùng</span>
             </div>
@@ -91,7 +97,7 @@ export default function HeroSection() {
             <div className={styles.spotlightPrice}>
               <div>
                 <span className={styles.spotlightPriceVal}>
-                  {spotlightAuction.currentPrice.toLocaleString('vi-VN')}
+                  {isMounted ? spotlightAuction.currentPrice.toLocaleString('vi-VN') : '...'}
                 </span>
                 <span className={styles.spotlightPriceSUI}> SUI</span>
               </div>
