@@ -360,6 +360,23 @@ export const auctions: Auction[] = [
     featured: false,
     hotDeal: false,
   },
+  {
+    id: 'test-1',
+    title: 'MacBook Pro M3 Max - Space Black',
+    description: 'Bản cấu hình cao nhất với 128GB RAM, 2TB SSD. Hàng chính hãng Apple Việt Nam, mới 100% nguyên seal.',
+    images: [],
+    categoryId: 'khac',
+    currentPrice: 350,
+    startPrice: 200,
+    minBidIncrement: 5,
+    bidCount: 12,
+    startTime: hoursAgo(10),
+    endTime: hoursFromNow(48),
+    seller: mockUsers[0],
+    status: 'active',
+    featured: true,
+    hotDeal: true,
+  },
 ];
 
 export const mockBids: Bid[] = [
