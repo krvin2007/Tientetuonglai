@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SuiWalletProvider from "@/components/providers/SuiWalletProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body>
-        {children}
+        <SuiWalletProvider>
+          {children}
+        </SuiWalletProvider>
       </body>
     </html>
   );

@@ -139,46 +139,13 @@
   border-color: var(--border-color-hover);
 }
 
-.connectBtn {
-  padding: 10px 20px;
-  background: var(--gradient-primary);
-  border-radius: var(--border-radius-sm);
-  color: white;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: all var(--transition-base);
+.walletBtnWrap {
   display: flex;
   align-items: center;
-  gap: 8px;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-  white-space: nowrap;
 }
 
-.connectBtn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
-}
-
-.walletInfo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 14px;
-  background: var(--bg-glass);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-}
-
-.walletBalance {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent-green);
-}
-
-.walletAddress {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  font-family: 'Space Grotesk', monospace;
+.mobileWalletWrap {
+  margin-top: 16px;
 }
 
 .mobileMenuBtn {

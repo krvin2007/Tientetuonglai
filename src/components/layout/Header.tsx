@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Search, Menu, X, Wallet } from 'lucide-react';
+import { Search, Menu, X } from 'lucide-react';
+import { ConnectButton } from '@mysten/dapp-kit';
 import styles from './Header.module.css';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,10 +17,6 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const handleConnect = () => {
-    setIsConnected(!isConnected);
-  };
 
   const navLinks = [
     { href: '/', label: 'Trang Chủ' },
@@ -59,17 +55,9 @@ export default function Header() {
               <Search size={18} />
             </button>
 
-            {isConnected ? (
-              <div className={styles.walletInfo} onClick={handleConnect}>
-                <span className={styles.walletBalance}>125.4 SUI</span>
-                <span className={styles.walletAddress}>0x1a2b...3c4d</span>
-              </div>
-            ) : (
-              <button className={styles.connectBtn} onClick={handleConnect}>
-                <Wallet size={16} />
-                Kết Nối Ví
-              </button>
-            )}
+            <div className={styles.walletBtnWrap}>
+              <ConnectButton connectText="Kết Nối Ví" />
+            </div>
 
             <button
               className={styles.mobileMenuBtn}
@@ -93,12 +81,9 @@ export default function Header() {
             {link.label}
           </Link>
         ))}
-        {!isConnected && (
-          <button className={styles.connectBtn} onClick={handleConnect} style={{ marginTop: 16 }}>
-            <Wallet size={16} />
-            Kết Nối Ví SUI
-          </button>
-        )}
+        <div className={styles.mobileWalletWrap}>
+          <ConnectButton connectText="Kết Nối Ví SUI" />
+        </div>
       </div>
     </>
   );
