@@ -303,6 +303,18 @@
   box-shadow: 0 0 50px rgba(59, 130, 246, 0.5);
 }
 
+.bidBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bidBtnLoading {
+  position: relative;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+}
+
 .bidNote {
   text-align: center;
   font-size: 0.75rem;

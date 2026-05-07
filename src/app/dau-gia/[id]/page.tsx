@@ -19,10 +19,37 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
 
   const [bidAmount, setBidAmount] = useState('');
   const [isMounted, setIsMounted] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState(auction?.currentPrice || 0);
+  const [bidCount, setBidCount] = useState(auction?.bidCount || 0);
+  const [isBidding, setIsBidding] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  const handleBid = () => {
+    if (!bidAmount || isNaN(Number(bidAmount))) {
+      alert('Vui lòng nhập số tiền hợp lệ');
+      return;
+    }
+
+    const amount = Number(bidAmount);
+    if (amount <= currentPrice) {
+      alert('Giá đặt phải cao hơn giá hiện tại');
+      return;
+    }
+
+    setIsBidding(true);
+    
+    // Simulate blockchain transaction
+    setTimeout(() => {
+      setCurrentPrice(amount);
+      setBidCount(prev => prev + 1);
+      setBidAmount('');
+      setIsBidding(false);
+      alert('Đặt giá thành công! Giao dịch đã được ghi nhận trên SUI Blockchain.');
+    }, 1500);
+  };
 
   if (!auction) {
     return (
@@ -161,14 +188,14 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
                 <div className={styles.currentPriceWrap}>
                   <div className={styles.currentPriceLabel}>Giá hiện tại</div>
                   <div className={styles.currentPrice}>
-                    {auction.currentPrice.toLocaleString('vi-VN')}
+                    {currentPrice.toLocaleString('vi-VN')}
                     <span className={styles.currentPriceSUI}> SUI</span>
                   </div>
                 </div>
 
                 <div className={styles.bidStats}>
                   <div className={styles.bidStatItem}>
-                    <div className={styles.bidStatValue}>{auction.bidCount}</div>
+                    <div className={styles.bidStatValue}>{bidCount}</div>
                     <div className={styles.bidStatLabel}>Lượt đấu giá</div>
                   </div>
                   <div className={styles.bidStatItem}>
@@ -196,9 +223,13 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
                   </p>
                 </div>
 
-                <button className={styles.bidBtn}>
+                <button 
+                  className={`${styles.bidBtn} ${isBidding ? styles.bidBtnLoading : ''}`}
+                  onClick={handleBid}
+                  disabled={isBidding}
+                >
                   <Gavel size={18} />
-                  Đặt Giá
+                  {isBidding ? 'Đang xử lý...' : 'Đặt Giá'}
                 </button>
 
                 <p className={styles.bidNote}>
