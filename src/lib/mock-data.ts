@@ -113,6 +113,15 @@ const mockUsers: User[] = [
     walletAddress: '0x1a2b...3c4d',
   },
   {
+    id: 'u-system',
+    name: 'Hệ Thống Đấu Giá',
+    avatar: '',
+    vipTier: 'vang',
+    totalAuctions: 999,
+    rating: 5.0,
+    walletAddress: '0x0000...0000',
+  },
+  {
     id: 'u2',
     name: 'Trần Thị Mai',
     avatar: '',
@@ -139,15 +148,6 @@ const mockUsers: User[] = [
     rating: 4.2,
     walletAddress: '0x3m4n...5o6p',
   },
-  {
-    id: 'u5',
-    name: 'Hoàng Minh Tuấn',
-    avatar: '',
-    vipTier: 'vang',
-    totalAuctions: 67,
-    rating: 4.95,
-    walletAddress: '0x7q8r...9s0t',
-  },
 ];
 
 // Create dates relative to now
@@ -156,6 +156,23 @@ const hoursFromNow = (h: number) => new Date(now.getTime() + h * 3600000).toISOS
 const hoursAgo = (h: number) => new Date(now.getTime() - h * 3600000).toISOString();
 
 export const auctions: Auction[] = [
+  {
+    id: 'sui-test-1',
+    title: 'Sản phẩm Test Hệ Thống - 1 SUI',
+    description: 'Sản phẩm đặc biệt dùng để kiểm tra tính năng kết nối ví và đặt giá trên mạng SUI. Sau khi kết nối ví thật, bạn có thể thử đặt giá với sản phẩm này.',
+    images: ['/images/sui-logo.png'],
+    categoryId: 'khac',
+    currentPrice: 1,
+    startPrice: 1,
+    minBidIncrement: 0.1,
+    bidCount: 0,
+    startTime: hoursAgo(1),
+    endTime: hoursFromNow(168), // 1 week
+    seller: mockUsers[1], // Hệ Thống
+    status: 'active',
+    featured: true,
+    hotDeal: true,
+  },
   {
     id: 'a1',
     title: 'Máy Pha Cà Phê DeLonghi Magnifica',

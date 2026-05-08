@@ -9,9 +9,11 @@ import Footer from '@/components/layout/Footer';
 import CountdownTimer from '@/components/auction/CountdownTimer';
 import { auctions, mockBids, categories } from '@/lib/mock-data';
 import { getCategoryEmoji, getVipLabel, formatRelativeTime, formatDate } from '@/lib/utils';
+import { useCurrentAccount } from '@mysten/dapp-kit';
 import styles from './page.module.css';
 
 export default function AuctionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const account = useCurrentAccount();
   const { id } = use(params);
   const auction = auctions.find(a => a.id === id);
   const bids = mockBids.filter(b => b.auctionId === id);
@@ -28,6 +30,11 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
   }, []);
 
   const handleBid = () => {
+    if (!account) {
+      alert('Vui lòng kết nối ví SUI của bạn để đặt giá!');
+      return;
+    }
+
     if (!bidAmount || isNaN(Number(bidAmount))) {
       alert('Vui lòng nhập số tiền hợp lệ');
       return;
@@ -41,13 +48,13 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
 
     setIsBidding(true);
     
-    // Simulate blockchain transaction
+    // Simulate blockchain transaction with real account
     setTimeout(() => {
       setCurrentPrice(amount);
       setBidCount(prev => prev + 1);
       setBidAmount('');
       setIsBidding(false);
-      alert('Đặt giá thành công! Giao dịch đã được ghi nhận trên SUI Blockchain.');
+      alert(`Đặt giá thành công! Giao dịch từ ví ${account.address.slice(0,6)}...${account.address.slice(-4)} đã được giả lập trên SUI Blockchain.`);
     }, 1500);
   };
 
