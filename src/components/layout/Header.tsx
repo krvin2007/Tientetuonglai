@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Search, Menu, X } from 'lucide-react';
 import { ConnectButton } from '@mysten/dapp-kit';
+import { useUser } from '@/components/providers/UserProvider';
 import styles from './Header.module.css';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { vipTier } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,7 +37,23 @@ export default function Header() {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span className={styles.logoText}>Tientetuonglai</span>
-                <span style={{ fontSize: '10px', background: 'var(--accent-gold)', padding: '2px 6px', borderRadius: '4px', color: 'black', fontWeight: 'bold' }}>PRO</span>
+                {vipTier !== 'none' ? (
+                  <span 
+                    style={{ 
+                      fontSize: '10px', 
+                      background: vipTier === 'vang' ? 'var(--gradient-gold)' : vipTier === 'bac' ? '#c0c0c0' : '#cd7f32', 
+                      padding: '2px 8px', 
+                      borderRadius: '10px', 
+                      color: vipTier === 'vang' ? 'black' : 'white', 
+                      fontWeight: 'bold',
+                      boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)'
+                    }}
+                  >
+                    VIP {vipTier.toUpperCase()}
+                  </span>
+                ) : (
+                  <span style={{ fontSize: '10px', background: 'var(--accent-gold)', padding: '2px 6px', borderRadius: '4px', color: 'black', fontWeight: 'bold' }}>PRO</span>
+                )}
               </div>
               <span className={styles.logoSub}>SUI Auction Platform</span>
             </div>

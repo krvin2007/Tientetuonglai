@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { getVipLabel } from '@/lib/utils';
-import { useCurrentAccount, useSuiClientQuery } from '@mysten/dapp-kit';
-import { ConnectButton } from '@mysten/dapp-kit';
+import { useCurrentAccount, ConnectButton } from '@mysten/dapp-kit';
+import { useUser } from '@/components/providers/UserProvider';
 import styles from './page.module.css';
 
 const mockActivity = [
@@ -20,11 +20,7 @@ const mockActivity = [
 
 export default function AccountPage() {
   const account = useCurrentAccount();
-  const { data: balanceData } = useSuiClientQuery(
-    'getBalance',
-    { owner: account?.address || '' },
-    { enabled: !!account?.address }
-  );
+  const { balance, vipTier } = useUser();
 
   const [activeTab, setActiveTab] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
@@ -32,8 +28,6 @@ export default function AccountPage() {
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
-  const balance = balanceData ? (Number(balanceData.totalBalance) / 1_000_000_000).toFixed(2) : '0.00';
 
   const filtered = activeTab === 'all'
     ? mockActivity
@@ -83,13 +77,9 @@ export default function AccountPage() {
                 </div>
                 <h1 className={styles.profileName}>Tài khoản SUI</h1>
                 <span
-                  className={styles.profileVip}
-                  style={{
-                    background: 'rgba(255, 215, 0, 0.15)',
-                    color: '#ffd700',
-                  }}
+                  className={`${styles.profileVip} ${vipTier !== 'none' ? styles[`profileVip${vipTier.charAt(0).toUpperCase() + vipTier.slice(1)}`] : ''}`}
                 >
-                  {getVipLabel('none')}
+                  {getVipLabel(vipTier)}
                 </span>
 
                 <div className={styles.profileWallet}>

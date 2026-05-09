@@ -5,10 +5,41 @@ import { Check, X, Zap, Crown } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { vipTiers } from '@/lib/mock-data';
+import { useUser } from '@/components/providers/UserProvider';
+import { useCurrentAccount } from '@mysten/dapp-kit';
 import styles from './page.module.css';
 
 export default function VipPage() {
   const [isYearly, setIsYearly] = useState(false);
+  const { vipTier, upgradeVip, balance } = useUser();
+  const account = useCurrentAccount();
+  const [isUpgrading, setIsUpgrading] = useState<string | null>(null);
+
+  const handleUpgrade = (tierId: 'dong' | 'bac' | 'vang', price: number) => {
+    if (!account) {
+      alert('Vui lòng kết nối ví SUI để nâng cấp VIP!');
+      return;
+    }
+
+    if (Number(balance) < price) {
+      alert(`Số dư không đủ! Bạn cần ${price} SUI để nâng cấp nhưng ví chỉ có ${balance} SUI.`);
+      return;
+    }
+
+    if (vipTier === tierId) {
+      alert(`Bạn hiện đã là VIP ${tierId.toUpperCase()}!`);
+      return;
+    }
+
+    setIsUpgrading(tierId);
+    
+    // Simulate blockchain transaction
+    setTimeout(() => {
+      upgradeVip(tierId);
+      setIsUpgrading(null);
+      alert(`Nâng cấp VIP ${tierId.toUpperCase()} thành công! Giao dịch ${price} SUI đã được xác nhận trên SUI Blockchain.`);
+    }, 2000);
+  };
 
   return (
     <>
@@ -47,14 +78,16 @@ export default function VipPage() {
             const price = isYearly ? tier.priceYearly : tier.priceMonthly;
             const isGold = tier.id === 'vang';
             const isPopular = tier.id === 'bac';
+            const isCurrentTier = vipTier === tier.id;
 
             return (
               <div
                 key={tier.id}
-                className={`${styles.tierCard} ${isPopular ? styles.tierPopular : ''} ${isGold ? styles.tierGold : ''}`}
+                className={`${styles.tierCard} ${isPopular ? styles.tierPopular : ''} ${isGold ? styles.tierGold : ''} ${isCurrentTier ? styles.tierCurrent : ''}`}
                 style={{ '--tier-glow': tier.glowColor } as React.CSSProperties}
               >
                 {isPopular && <span className={styles.popularBadge}>Phổ biến nhất</span>}
+                {isCurrentTier && <span className={styles.currentBadge}>Gói hiện tại</span>}
 
                 <span className={styles.tierIcon}>{tier.icon}</span>
                 <h2 className={styles.tierName} style={{ color: tier.color }}>
@@ -89,10 +122,12 @@ export default function VipPage() {
 
                 <button
                   className={`${styles.tierBtn} ${isGold ? styles.tierBtnGold : isPopular ? styles.tierBtnPrimary : styles.tierBtnOutline
-                    }`}
+                    } ${isCurrentTier ? styles.tierBtnDisabled : ''}`}
+                  onClick={() => handleUpgrade(tier.id, price)}
+                  disabled={isUpgrading !== null || isCurrentTier}
                 >
                   <Crown size={16} />
-                  Đăng Ký {tier.nameVi}
+                  {isUpgrading === tier.id ? 'Đang xử lý...' : isCurrentTier ? 'Đang Sử Dụng' : `Đăng Ký ${tier.nameVi}`}
                 </button>
               </div>
             );

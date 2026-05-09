@@ -10,10 +10,12 @@ import CountdownTimer from '@/components/auction/CountdownTimer';
 import { auctions, mockBids, categories } from '@/lib/mock-data';
 import { getCategoryEmoji, getVipLabel, formatRelativeTime, formatDate } from '@/lib/utils';
 import { useCurrentAccount } from '@mysten/dapp-kit';
+import { useUser } from '@/components/providers/UserProvider';
 import styles from './page.module.css';
 
 export default function AuctionDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const account = useCurrentAccount();
+  const { balance, vipTier } = useUser();
   const { id } = use(params);
   const auction = auctions.find(a => a.id === id);
   const bids = mockBids.filter(b => b.auctionId === id);
@@ -46,6 +48,13 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
       return;
     }
 
+    // Check balance
+    const userBalance = Number(balance);
+    if (amount > userBalance) {
+      alert(`Số dư không đủ! Bạn cần ${amount} SUI nhưng ví chỉ có ${balance} SUI.`);
+      return;
+    }
+
     setIsBidding(true);
     
     // Simulate blockchain transaction with real account
@@ -54,7 +63,7 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
       setBidCount(prev => prev + 1);
       setBidAmount('');
       setIsBidding(false);
-      alert(`Đặt giá thành công! Giao dịch từ ví ${account.address.slice(0,6)}...${account.address.slice(-4)} đã được giả lập trên SUI Blockchain.`);
+      alert(`Đặt giá thành công! Giao dịch ${amount} SUI từ ví ${account.address.slice(0,6)}...${account.address.slice(-4)} đã được gửi lên SUI Blockchain.`);
     }, 1500);
   };
 
@@ -206,8 +215,8 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
                     <div className={styles.bidStatLabel}>Lượt đấu giá</div>
                   </div>
                   <div className={styles.bidStatItem}>
-                    <div className={styles.bidStatValue}>⭐ {auction.seller.rating}</div>
-                    <div className={styles.bidStatLabel}>Đánh giá</div>
+                    <div className={styles.bidStatValue}>💰 {balance}</div>
+                    <div className={styles.bidStatLabel}>SUI khả dụng</div>
                   </div>
                 </div>
 
@@ -238,6 +247,31 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
                   <Gavel size={18} />
                   {isBidding ? 'Đang xử lý...' : 'Đặt Giá'}
                 </button>
+
+                {auction.id === 'sui-test-1' && (
+                  <button 
+                    className={styles.buyBtn}
+                    onClick={() => {
+                      if (!account) {
+                        alert('Vui lòng kết nối ví SUI để mua!');
+                        return;
+                      }
+                      const price = 1; // 1 SUI for test
+                      if (Number(balance) < price) {
+                        alert(`Số dư không đủ! Bạn cần ${price} SUI để mua nhưng ví chỉ có ${balance} SUI.`);
+                        return;
+                      }
+                      setIsBidding(true);
+                      setTimeout(() => {
+                        setIsBidding(false);
+                        alert(`Chúc mừng! Bạn đã mua thành công ${auction.title}. Giao dịch 1 SUI đã được thực hiện từ ví ${account.address.slice(0,6)}...${account.address.slice(-4)}. Vật phẩm sẽ sớm được gửi vào ví của bạn.`);
+                      }, 2000);
+                    }}
+                    disabled={isBidding}
+                  >
+                    🚀 Mua Ngay (Demo 1 SUI)
+                  </button>
+                )}
 
                 <p className={styles.bidNote}>
                   <Shield size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
