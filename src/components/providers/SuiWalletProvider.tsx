@@ -30,9 +30,19 @@ const { networkConfig } = createNetworkConfig({
 const queryClient = new QueryClient();
 
 export default function SuiWalletProvider({ children }: { children: React.ReactNode }) {
+	// Initialize network from localStorage if available, default to mainnet
+	const [defaultNetwork, setDefaultNetwork] = React.useState('mainnet');
+
+	React.useEffect(() => {
+		const savedNetwork = localStorage.getItem('suiNetwork');
+		if (savedNetwork && (savedNetwork === 'mainnet' || savedNetwork === 'testnet' || savedNetwork === 'devnet' || savedNetwork === 'localnet')) {
+			setDefaultNetwork(savedNetwork);
+		}
+	}, []);
+
 	return (
 		<QueryClientProvider client={queryClient}>
-			<SuiClientProvider networks={networkConfig} defaultNetwork="mainnet">
+			<SuiClientProvider networks={networkConfig} defaultNetwork={defaultNetwork}>
 				<WalletProvider autoConnect>
 					{children}
 				</WalletProvider>

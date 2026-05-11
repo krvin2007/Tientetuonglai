@@ -203,12 +203,38 @@
   letter-spacing: 0.5px;
 }
 
+.networkSwitcher {
+  position: relative;
+}
+
+.networkSelect {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.networkSelect:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--border-color-hover);
+  color: var(--text-primary);
+}
+
 @media (max-width: 1024px) {
   .nav {
     display: none;
   }
   .mobileMenuBtn {
     display: flex;
+  }
+  .networkSwitcher {
+    display: none;
   }
 }
 

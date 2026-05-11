@@ -229,11 +229,23 @@
   margin-bottom: 16px;
 }
 
+.vipBenefitTag {
+  background: var(--gradient-gold);
+  color: black;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
 .bidInputLabel {
   font-size: 0.8rem;
   color: var(--text-secondary);
   margin-bottom: 8px;
-  display: block;
+  display: flex;
+  align-items: center;
 }
 
 .bidInputWrap {

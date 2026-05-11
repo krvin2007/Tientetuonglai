@@ -6,14 +6,17 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { vipTiers } from '@/lib/mock-data';
 import { useUser } from '@/components/providers/UserProvider';
-import { useCurrentAccount } from '@mysten/dapp-kit';
+import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
+import { Transaction } from '@mysten/sui/transactions';
 import styles from './page.module.css';
 
 export default function VipPage() {
   const [isYearly, setIsYearly] = useState(false);
-  const { vipTier, upgradeVip, balance } = useUser();
+  const { vipTier, upgradeVip, balance, network } = useUser();
   const account = useCurrentAccount();
   const [isUpgrading, setIsUpgrading] = useState<string | null>(null);
+
+  const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
   const handleUpgrade = (tierId: 'dong' | 'bac' | 'vang', price: number) => {
     if (!account) {
@@ -21,9 +24,7 @@ export default function VipPage() {
       return;
     }
 
-    // Convert balance string back to number for comparison
     const userBalance = Number(balance.replace(/,/g, ''));
-
     if (userBalance < price) {
       alert(`Số dư không đủ! Bạn cần ${price} SUI để nâng cấp nhưng ví chỉ có ${balance} SUI.\n\nLưu ý: Hãy kiểm tra xem bạn đã chọn đúng mạng (Mainnet/Testnet) trong ví chưa nhé!`);
       return;
@@ -36,12 +37,38 @@ export default function VipPage() {
 
     setIsUpgrading(tierId);
     
-    // Simulate blockchain transaction
-    setTimeout(() => {
-      upgradeVip(tierId);
+    try {
+      const txb = new Transaction();
+      // In a real app, this would be a move call. 
+      // Here we simulate a real transaction by doing a small transfer or just prompting for signature.
+      // We'll transfer a tiny amount of SUI to the user themselves to trigger the wallet popup.
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(0)]); // Split 0 SUI (just for the transaction feel)
+      txb.transferObjects([coin], txb.pure.address(account.address));
+      
+      signAndExecuteTransaction(
+        {
+          transaction: txb,
+          chain: `sui:${network}`,
+        },
+        {
+          onSuccess: (result) => {
+            console.log('Transaction successful', result);
+            upgradeVip(tierId);
+            setIsUpgrading(null);
+            alert(`Nâng cấp VIP ${tierId.toUpperCase()} thành công! Giao dịch đã được xác nhận trên SUI Blockchain.`);
+          },
+          onError: (error) => {
+            console.error('Transaction failed', error);
+            setIsUpgrading(null);
+            alert(`Giao dịch thất bại: ${error.message || 'Người dùng từ chối giao dịch hoặc lỗi mạng'}`);
+          },
+        }
+      );
+    } catch (err) {
+      console.error(err);
       setIsUpgrading(null);
-      alert(`Nâng cấp VIP ${tierId.toUpperCase()} thành công! Giao dịch ${price} SUI đã được xác nhận trên SUI Blockchain.`);
-    }, 2000);
+      alert('Có lỗi xảy ra khi tạo giao dịch.');
+    }
   };
 
   return (

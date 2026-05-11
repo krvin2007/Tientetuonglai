@@ -10,7 +10,7 @@ import styles from './Header.module.css';
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const { vipTier } = useUser();
+  const { vipTier, network, changeNetwork } = useUser();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,6 +72,18 @@ export default function Header() {
           </nav>
 
           <div className={styles.headerActions}>
+            <div className={styles.networkSwitcher}>
+              <select 
+                value={network} 
+                onChange={(e) => changeNetwork(e.target.value)}
+                className={styles.networkSelect}
+              >
+                <option value="mainnet">Mainnet</option>
+                <option value="testnet">Testnet</option>
+                <option value="devnet">Devnet</option>
+              </select>
+            </div>
+
             <button className={styles.searchBtn} aria-label="Tìm kiếm">
               <Search size={18} />
             </button>
