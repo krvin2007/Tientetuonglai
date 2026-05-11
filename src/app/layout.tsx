@@ -17,8 +17,8 @@ export default function RootLayout({
   return (
     <html lang="vi">
       <body>
-        <div style={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'red', color: 'white', padding: '2px 10px', fontSize: '10px', borderRadius: '0 0 5px 5px', pointerEvents: 'none' }}>
-          BUILD: 2026-05-11 11:42 (v1.1.6)
+        <div style={{ position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'red', color: 'white', padding: '5px 20px', fontSize: '14px', fontWeight: 'bold', borderRadius: '0 0 10px 10px', pointerEvents: 'none', boxShadow: '0 0 20px rgba(255,0,0,0.5)' }}>
+          VERCEL DEPLOY TEST: v1.1.7 (2026-05-11 12:00)
         </div>
         <SuiWalletProvider>
           <UserProvider>

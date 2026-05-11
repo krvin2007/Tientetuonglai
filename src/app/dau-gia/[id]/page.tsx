@@ -61,13 +61,12 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
     
     try {
       const txb = new Transaction();
-      // Simulate real bid transaction by sending a dummy object/coin or just signing
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(0)]);
-      txb.transferObjects([coin], txb.pure.address(account.address));
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure(0, 'u64')]);
+      txb.transferObjects([coin], txb.pure(account.address, 'address'));
 
       signAndExecuteTransaction(
         {
-          transaction: txb,
+          transaction: txb as any,
           chain: `sui:${network}`,
         },
         {
@@ -79,7 +78,7 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
             setIsBidding(false);
             alert(`Đặt giá thành công! Giao dịch ${amount} SUI từ ví ${account.address.slice(0,6)}...${account.address.slice(-4)} đã được xác nhận trên SUI Blockchain.`);
           },
-          onError: (error) => {
+          onError: (error: any) => {
             console.error('Bid failed', error);
             setIsBidding(false);
             alert(`Đặt giá thất bại: ${error.message || 'Giao dịch bị từ chối'}`);

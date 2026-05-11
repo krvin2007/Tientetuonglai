@@ -39,15 +39,13 @@ export default function VipPage() {
     
     try {
       const txb = new Transaction();
-      // In a real app, this would be a move call. 
-      // Here we simulate a real transaction by doing a small transfer or just prompting for signature.
-      // We'll transfer a tiny amount of SUI to the user themselves to trigger the wallet popup.
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(0)]); // Split 0 SUI (just for the transaction feel)
-      txb.transferObjects([coin], txb.pure.address(account.address));
+      // Use txb.pure(0, 'u64') which is more compatible across SDK versions
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure(0, 'u64')]); 
+      txb.transferObjects([coin], txb.pure(account.address, 'address'));
       
       signAndExecuteTransaction(
         {
-          transaction: txb,
+          transaction: txb as any,
           chain: `sui:${network}`,
         },
         {
@@ -57,7 +55,7 @@ export default function VipPage() {
             setIsUpgrading(null);
             alert(`Nâng cấp VIP ${tierId.toUpperCase()} thành công! Giao dịch đã được xác nhận trên SUI Blockchain.`);
           },
-          onError: (error) => {
+          onError: (error: any) => {
             console.error('Transaction failed', error);
             setIsUpgrading(null);
             alert(`Giao dịch thất bại: ${error.message || 'Người dùng từ chối giao dịch hoặc lỗi mạng'}`);
