@@ -233,9 +233,6 @@
   .mobileMenuBtn {
     display: flex;
   }
-  .networkSwitcher {
-    display: none;
-  }
 }
 
 @media (max-width: 640px) {
