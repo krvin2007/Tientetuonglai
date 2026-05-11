@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 
 import { createNetworkConfig, SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
