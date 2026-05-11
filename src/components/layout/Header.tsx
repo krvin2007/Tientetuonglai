@@ -55,7 +55,7 @@ export default function Header() {
                   <span style={{ fontSize: '10px', background: 'var(--accent-gold)', padding: '2px 6px', borderRadius: '4px', color: 'black', fontWeight: 'bold' }}>PRO</span>
                 )}
               </div>
-              <span className={styles.logoSub}>SUI Auction Platform v1.1.5</span>
+              <span className={styles.logoSub}>SUI Auction Platform v1.1.8-FINAL</span>
             </div>
           </Link>
 
