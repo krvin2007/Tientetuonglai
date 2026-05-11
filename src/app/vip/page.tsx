@@ -21,8 +21,11 @@ export default function VipPage() {
       return;
     }
 
-    if (Number(balance) < price) {
-      alert(`Số dư không đủ! Bạn cần ${price} SUI để nâng cấp nhưng ví chỉ có ${balance} SUI.`);
+    // Convert balance string back to number for comparison
+    const userBalance = Number(balance.replace(/,/g, ''));
+
+    if (userBalance < price) {
+      alert(`Số dư không đủ! Bạn cần ${price} SUI để nâng cấp nhưng ví chỉ có ${balance} SUI.\n\nLưu ý: Hãy kiểm tra xem bạn đã chọn đúng mạng (Mainnet/Testnet) trong ví chưa nhé!`);
       return;
     }
 

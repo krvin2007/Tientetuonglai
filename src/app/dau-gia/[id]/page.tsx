@@ -49,9 +49,9 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
     }
 
     // Check balance
-    const userBalance = Number(balance);
+    const userBalance = Number(balance.replace(/,/g, ''));
     if (amount > userBalance) {
-      alert(`Số dư không đủ! Bạn cần ${amount} SUI nhưng ví chỉ có ${balance} SUI.`);
+      alert(`Số dư không đủ! Bạn cần ${amount} SUI nhưng ví chỉ có ${balance} SUI.\n\nLưu ý: Nếu bạn có tiền trong ví nhưng vẫn thấy 0.00, hãy kiểm tra xem bạn đã chọn đúng mạng (Mainnet/Testnet) chưa nhé!`);
       return;
     }
 
@@ -257,8 +257,9 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
                         return;
                       }
                       const price = 1; // 1 SUI for test
-                      if (Number(balance) < price) {
-                        alert(`Số dư không đủ! Bạn cần ${price} SUI để mua nhưng ví chỉ có ${balance} SUI.`);
+                      const userBalance = Number(balance.replace(/,/g, ''));
+                      if (userBalance < price) {
+                        alert(`Số dư không đủ! Bạn cần ${price} SUI để mua nhưng ví chỉ có ${balance} SUI.\n\nLưu ý: Hãy kiểm tra lại mạng của ví (Mainnet/Testnet) nhé!`);
                         return;
                       }
                       setIsBidding(true);

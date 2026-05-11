@@ -37,10 +37,17 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('userVipTier', tier);
   };
 
-  const balance = balanceData ? (Number(balanceData.totalBalance) / 1_000_000_000).toFixed(2) : '0.00';
+  const balance = (balanceData && balanceData.totalBalance) 
+    ? (Number(balanceData.totalBalance) / 1_000_000_000).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) 
+    : '0.00';
 
   return (
-    <UserContext.Provider value={{ vipTier, upgradeVip, balance, isLoadingBalance }}>
+    <UserContext.Provider value={{ 
+      vipTier, 
+      upgradeVip, 
+      balance, 
+      isLoadingBalance: isLoadingBalance && !!account 
+    }}>
       {children}
     </UserContext.Provider>
   );
