@@ -10,6 +10,7 @@ import { auctions, mockBids } from '@/lib/mock-data';
 import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { useUser } from '@/components/providers/UserProvider';
+import LiveClock from '@/components/common/LiveClock';
 import styles from './page.module.css';
 
 const VAULT_ADDRESS = '0x8979147e4c9f1390494df9f87f54c25a07c30a4306e987c6f0592945d8b7b252';
@@ -210,11 +211,19 @@ export default function AuctionDetailPage() {
                   PHIÊN ĐANG DIỄN RA
                 </div>
                 
+                <div className={styles.currentClockSection}>
+                  <span className={styles.currentClockLabel}>Thời gian hiện tại:</span>
+                  <LiveClock className={styles.currentClock} showIcon={true} />
+                </div>
+
                 <div className={styles.bidTimerWrap}>
-                  <Clock size={20} style={{ marginRight: '8px', color: 'var(--accent-blue-light)' }} />
-                  <span style={{ fontWeight: 700, fontSize: '1.2rem' }}>
-                    {new Date(auction.endTime).toLocaleDateString('vi-VN')} {new Date(auction.endTime).toLocaleTimeString('vi-VN')}
-                  </span>
+                  <div className={styles.endTimeLabelWrap}>
+                    <Clock size={16} />
+                    <span>Thời gian kết thúc:</span>
+                  </div>
+                  <div className={styles.endTimeValue}>
+                    {new Date(auction.endTime).toLocaleDateString('vi-VN')} {new Date(auction.endTime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  </div>
                 </div>
 
                 <div className={styles.currentPriceWrap}>

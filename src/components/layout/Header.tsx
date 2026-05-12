@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Search, Menu, X } from 'lucide-react';
 import { ConnectButton } from '@mysten/dapp-kit';
 import { useUser } from '@/components/providers/UserProvider';
+import LiveClock from '@/components/common/LiveClock';
 import styles from './Header.module.css';
 
 export default function Header() {
@@ -72,6 +73,10 @@ export default function Header() {
           </nav>
 
           <div className={styles.headerActions}>
+            <div className={styles.headerClockWrap}>
+              <LiveClock />
+            </div>
+
             <div className={styles.networkSwitcher}>
               <select 
                 value={network} 

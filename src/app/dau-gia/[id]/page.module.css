@@ -147,14 +147,55 @@
   animation: glow 4s ease-in-out infinite;
 }
 
+.currentClockSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(59, 130, 246, 0.05);
+  border-radius: var(--border-radius-md);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.currentClockLabel {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.currentClock {
+  font-size: 1.1rem;
+  color: var(--accent-blue-light);
+}
+
 .bidTimerWrap {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: var(--border-radius-md);
   margin-bottom: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.endTimeLabelWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.endTimeValue {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', monospace;
 }
 
 .bidTimerLabel {
