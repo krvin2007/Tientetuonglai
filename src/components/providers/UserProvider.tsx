@@ -11,6 +11,7 @@ interface UserContextType {
   balance: string;
   isLoadingBalance: boolean;
   network: string;
+  networkName: string;
   changeNetwork: (network: string) => void;
 }
 
@@ -26,7 +27,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     { owner: account?.address || '' },
     { 
       enabled: !!account?.address,
-      refetchInterval: 5000 // Faster refetch for better UX
+      refetchInterval: 5000 
     }
   );
 
@@ -36,14 +37,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       console.log('Account connected:', account.address);
     }
     if (balanceData) {
-      console.log('Balance data received:', balanceData);
+      console.log('Balance data received for address ' + (account?.address || 'unknown') + ':', balanceData);
     }
     if (balanceError) {
       console.error('Balance fetch error:', balanceError);
     }
   }, [account, balanceData, balanceError]);
 
-  // Persistence for VIP tier and network
+  // Persistence
   useEffect(() => {
     const savedVip = localStorage.getItem('userVipTier') as VipTier;
     if (savedVip && ['none', 'dong', 'bac', 'vang'].includes(savedVip)) {
@@ -64,15 +65,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const changeNetwork = (newNetwork: string) => {
     setNetwork(newNetwork);
     localStorage.setItem('suiNetwork', newNetwork);
-    // Hard reload to ensure all providers and hooks re-initialize with the new network
     window.location.reload();
   };
 
-  // Convert MIST string to SUI number safely
   const formatBalance = (totalBalance?: string) => {
     if (!totalBalance) return '0.00';
     try {
-      // Use BigInt to avoid precision issues with u128
       const mist = BigInt(totalBalance);
       const sui = Number(mist) / 1_000_000_000;
       return sui.toLocaleString('en-US', { 
@@ -80,12 +78,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         maximumFractionDigits: 9 
       });
     } catch (e) {
-      console.error('Error formatting balance:', e);
       return '0.00';
     }
   };
 
   const balance = formatBalance(balanceData?.totalBalance);
+  
+  // Human readable network name
+  const networkName = network === 'mainnet' ? 'Mainnet' : 
+                      network === 'testnet' ? 'Testnet' : 
+                      network === 'devnet' ? 'Devnet' : 'Localnet';
 
   return (
     <UserContext.Provider value={{ 
@@ -94,6 +96,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       balance, 
       isLoadingBalance: isLoadingBalance && !!account,
       network,
+      networkName,
       changeNetwork
     }}>
       {children}

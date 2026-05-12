@@ -211,6 +211,8 @@
 }
 
 .tierBtn {
+  position: relative;
+  z-index: 10;
   width: 100%;
   padding: 14px;
   border-radius: var(--border-radius-md);
@@ -263,6 +265,7 @@
   cursor: not-allowed;
   box-shadow: none !important;
   transform: none !important;
+  z-index: 5;
 }
 
 /* Comparison Section */

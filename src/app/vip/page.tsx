@@ -48,7 +48,6 @@ export default function VipPage() {
       const txb = new Transaction();
       
       // For demo purposes, we do a small self-transfer to prove ownership and signature
-      // In a production app, this would be a MoveCall to a VIP contract
       const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(1000)]); // 1000 MIST = 0.000001 SUI
       txb.transferObjects([coin], txb.pure.address(account.address));
       
@@ -139,6 +138,9 @@ export default function VipPage() {
                     {price}
                   </span>
                   <span className={styles.tierPriceSUI}> SUI</span>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginTop: '4px' }}>
+                    Mạng: {network.toUpperCase()}
+                  </div>
                   <br />
                   <span className={styles.tierPricePeriod}>
                     /{isYearly ? 'năm' : 'tháng'}

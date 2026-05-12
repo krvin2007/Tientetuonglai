@@ -20,7 +20,7 @@ const mockActivity = [
 
 export default function AccountPage() {
   const account = useCurrentAccount();
-  const { balance, vipTier } = useUser();
+  const { balance, vipTier, networkName } = useUser();
 
   const [activeTab, setActiveTab] = useState('all');
   const [isMounted, setIsMounted] = useState(false);
@@ -94,6 +94,9 @@ export default function AccountPage() {
                   <div className={styles.profileBalanceValue}>
                     {balance}
                     <span className={styles.profileBalanceSUI}> SUI</span>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '4px' }}>
+                      ({networkName})
+                    </div>
                   </div>
                 </div>
               </div>
