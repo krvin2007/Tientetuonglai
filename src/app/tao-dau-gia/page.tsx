@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
-import { Upload, Gavel, AlertCircle } from 'lucide-react';
+import { Upload, Gavel, AlertCircle, X, Image as ImageIcon } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { categories } from '@/lib/mock-data';
@@ -18,6 +18,8 @@ export default function CreateAuctionPage() {
     minIncrement: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const durations = [
     { id: '1d', label: '1 Ngày' },
@@ -31,9 +33,37 @@ export default function CreateAuctionPage() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setSelectedImages(prev => [...prev, event.target?.result as string]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = () => {
     if (!formData.title || !formData.startPrice || !formData.categoryId) {
       alert('Vui lòng điền đầy đủ các thông tin bắt buộc');
+      return;
+    }
+
+    if (selectedImages.length === 0) {
+      alert('Vui lòng tải lên ít nhất một hình ảnh sản phẩm');
       return;
     }
 
@@ -67,10 +97,47 @@ export default function CreateAuctionPage() {
               <label className={`${styles.formLabel} ${styles.formLabelRequired}`}>
                 Hình ảnh sản phẩm
               </label>
-              <div className={styles.uploadArea}>
-                <div className={styles.uploadIcon}>📸</div>
-                <p className={styles.uploadText}>Kéo thả hoặc nhấn để tải ảnh lên</p>
-                <p className={styles.uploadHint}>PNG, JPG, GIF - Tối đa 10MB mỗi ảnh</p>
+              
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className={styles.hiddenInput} 
+                multiple 
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{ display: 'none' }}
+              />
+
+              <div 
+                className={`${styles.uploadArea} ${selectedImages.length > 0 ? styles.uploadAreaHasFiles : ''}`}
+                onClick={handleUploadClick}
+              >
+                {selectedImages.length === 0 ? (
+                  <>
+                    <div className={styles.uploadIcon}>📸</div>
+                    <p className={styles.uploadText}>Kéo thả hoặc nhấn để tải ảnh lên</p>
+                    <p className={styles.uploadHint}>PNG, JPG, GIF - Tối đa 10MB mỗi ảnh</p>
+                  </>
+                ) : (
+                  <div className={styles.previewGrid}>
+                    {selectedImages.map((img, idx) => (
+                      <div key={idx} className={styles.previewItem} onClick={(e) => e.stopPropagation()}>
+                        <img src={img} alt={`Preview ${idx}`} />
+                        <button 
+                          className={styles.removeBtn} 
+                          onClick={() => removeImage(idx)}
+                          type="button"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    <div className={styles.addMore} onClick={handleUploadClick}>
+                      <Upload size={24} />
+                      <span>Thêm</span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
