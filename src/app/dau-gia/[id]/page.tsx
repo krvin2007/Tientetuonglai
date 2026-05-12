@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { ArrowLeft, Clock, Gavel, ShieldCheck, User, History, Zap, Crown } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { auctions, mockBids } from '@/lib/mock-data';
@@ -14,14 +16,32 @@ const VAULT_ADDRESS = '0x8979147e4c9f1390494df9f87f54c25a07c30a4306e987c6f059294
 
 export default function AuctionDetailPage() {
   const { id } = useParams();
+  const router = useRouter();
   const account = useCurrentAccount();
-  const { balance, network } = useUser();
+  const { balance, network, vipTier } = useUser();
   const [bidAmount, setBidAmount] = useState<string>('');
   const [isBidding, setIsBidding] = useState(false);
   const [isBuying, setIsBuying] = useState(false);
   
-  const auction = auctions.find(a => a.id === id) || auctions[0];
+  const auction = auctions.find(a => a.id === id);
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
+
+  if (!auction) {
+    return (
+      <>
+        <Header />
+        <div className={styles.notFound}>
+          <div className={styles.notFoundIcon}>🔍</div>
+          <h1 className={styles.notFoundTitle}>Không tìm thấy sản phẩm</h1>
+          <p className={styles.notFoundDesc}>Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+          <Link href="/dau-gia" className={styles.notFoundBtn}>
+            <ArrowLeft size={18} /> Quay lại danh sách
+          </Link>
+        </div>
+        <Footer />
+      </>
+    );
+  }
 
   const handleBid = async () => {
     if (!account) {
@@ -47,7 +67,6 @@ export default function AuctionDetailPage() {
       // Calculate MIST (1 SUI = 10^9 MIST)
       const mistAmount = BigInt(Math.floor(amount * 1_000_000_000));
       
-      // Split the amount from gas and transfer to vault
       const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(mistAmount)]); 
       txb.transferObjects([coin], txb.pure.address(VAULT_ADDRESS));
 
@@ -64,7 +83,7 @@ export default function AuctionDetailPage() {
           },
           onError: (error: any) => {
             console.error('Bid error', error);
-            alert(`Đặt giá thất bại: ${error.message || 'Lỗi kết nối RPC hoặc người dùng từ chối'}\n\nMẹo: Hãy kiểm tra mạng Testnet trong ví SUI của bạn!`);
+            alert(`Đặt giá thất bại: ${error.message || 'Lỗi kết nối RPC hoặc người dùng từ chối'}`);
             setIsBidding(false);
           },
         }
@@ -90,7 +109,6 @@ export default function AuctionDetailPage() {
     setIsBuying(true);
     try {
       const txb = new Transaction();
-      // Buy Now: Transfer the current price in SUI to the vault
       const mistAmount = BigInt(Math.floor(auction.currentPrice * 1_000_000_000));
       
       const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(mistAmount)]);
@@ -120,91 +138,171 @@ export default function AuctionDetailPage() {
     }
   };
 
+  const currentAuctionBids = mockBids.filter(b => b.auctionId === auction.id).sort((a, b) => b.amount - a.amount);
+
   return (
     <>
       <Header />
       <main className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.grid}>
-            {/* Left: Images */}
-            <div className={styles.imageSection}>
-              <div className={styles.mainImageWrap}>
-                <img src={auction.images[0]} alt={auction.title} className={styles.mainImage} />
+        <div className={styles.inner}>
+          <Link href="/dau-gia" className={styles.backLink}>
+            <ArrowLeft size={16} /> Quay lại danh sách
+          </Link>
+
+          <div className={styles.detailGrid}>
+            {/* Left: Images & Main Info */}
+            <div className={styles.leftCol}>
+              <div className={styles.imageMain}>
+                <img src={auction.images[0]} alt={auction.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className={styles.imageBadges}>
+                  {auction.hotDeal && <span className={`${styles.badge} ${styles.badgeHot}`}>HOT DEAL</span>}
+                  {auction.featured && <span className={`${styles.badge} ${styles.badgeFeatured}`}>TIÊU BIỂU</span>}
+                  <span className={`${styles.badge} ${styles.badgeCategory}`}>SUI Blockchain</span>
+                </div>
+              </div>
+
+              <div className={styles.infoCard}>
+                <h1 className={styles.title}>{auction.title}</h1>
+                <p className={styles.desc}>{auction.description}</p>
+                
+                <div className={styles.metaGrid}>
+                  <div className={styles.metaItem}>
+                    <div className={styles.metaLabel}>Mã phiên</div>
+                    <div className={styles.metaValue}>#{auction.id.toUpperCase()}</div>
+                  </div>
+                  <div className={styles.metaItem}>
+                    <div className={styles.metaLabel}>Mạng lưới</div>
+                    <div className={styles.metaValue}>{network.toUpperCase()}</div>
+                  </div>
+                  <div className={styles.metaItem}>
+                    <div className={styles.metaLabel}>Giá khởi điểm</div>
+                    <div className={styles.metaValue}>{auction.startPrice} SUI</div>
+                  </div>
+                  <div className={styles.metaItem}>
+                    <div className={styles.metaLabel}>Bước giá tối thiểu</div>
+                    <div className={styles.metaValue}>+{auction.minBidIncrement} SUI</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className={styles.sellerCard}>
+                <div className={styles.sellerAvatar}>
+                  {auction.seller.name.charAt(0)}
+                </div>
+                <div className={styles.sellerInfo}>
+                  <div className={styles.sellerName}>{auction.seller.name}</div>
+                  <div className={styles.sellerMeta}>
+                    <span>⭐ {auction.seller.rating}</span>
+                    <span>• {auction.seller.totalAuctions} phiên đấu</span>
+                  </div>
+                </div>
+                <div className={`${styles.sellerVip} vip-${auction.seller.vipTier}`}>
+                  {auction.seller.vipTier.toUpperCase()}
+                </div>
               </div>
             </div>
 
-            {/* Right: Info */}
-            <div className={styles.infoSection}>
-              <h1 className={styles.title}>{auction.title}</h1>
-              <p className={styles.description}>{auction.description}</p>
-              
-              <div className={styles.priceCard}>
-                <div className={styles.priceGrid}>
-                  <div>
-                    <div className={styles.label}>Giá hiện tại</div>
-                    <div className={styles.price}>{auction.currentPrice} SUI</div>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div className={styles.label}>Số dư khả dụng</div>
-                    <div className={styles.userBalance}>{balance} SUI</div>
+            {/* Right: Bid Panel */}
+            <div className={styles.rightCol}>
+              <div className={styles.bidCard}>
+                <div className={styles.bidTimerLabel}>
+                  <span className={styles.liveIndicator}></span>
+                  PHIÊN ĐANG DIỄN RA
+                </div>
+                
+                <div className={styles.bidTimerWrap}>
+                  <Clock size={20} style={{ marginRight: '8px', color: 'var(--accent-blue-light)' }} />
+                  <span style={{ fontWeight: 700, fontSize: '1.2rem' }}>
+                    {new Date(auction.endTime).toLocaleDateString('vi-VN')} {new Date(auction.endTime).toLocaleTimeString('vi-VN')}
+                  </span>
+                </div>
+
+                <div className={styles.currentPriceWrap}>
+                  <div className={styles.currentPriceLabel}>Giá hiện tại</div>
+                  <div className={styles.currentPrice}>
+                    {auction.currentPrice} <span className={styles.currentPriceSUI}>SUI</span>
                   </div>
                 </div>
 
-                <div className={styles.bidAction}>
-                  <div className={styles.inputWrap}>
+                <div className={styles.bidStats}>
+                  <div className={styles.bidStatItem}>
+                    <div className={styles.bidStatValue}>{auction.bidCount}</div>
+                    <div className={styles.bidStatLabel}>Lượt đặt</div>
+                  </div>
+                  <div className={styles.bidStatItem}>
+                    <div className={styles.bidStatValue}>100%</div>
+                    <div className={styles.bidStatLabel}>Tin cậy</div>
+                  </div>
+                </div>
+
+                <div className={styles.bidInputGroup}>
+                  <div className={styles.bidInputLabel}>
+                    Số tiền đấu giá
+                    {vipTier !== 'none' && <span className={styles.vipBenefitTag}>VIP ƯU TIÊN</span>}
+                  </div>
+                  <div className={styles.bidInputWrap}>
                     <input 
                       type="number" 
-                      placeholder={`Tối thiểu ${auction.currentPrice + auction.minBidIncrement}`}
-                      className={styles.input}
+                      className={styles.bidInput}
+                      placeholder={`>${auction.currentPrice + auction.minBidIncrement}`}
                       value={bidAmount}
                       onChange={(e) => setBidAmount(e.target.value)}
                     />
-                    <span className={styles.inputSui}>SUI</span>
+                    <div className={styles.bidCurrency}>SUI</div>
                   </div>
-                  <button 
-                    className={styles.bidBtn} 
-                    onClick={handleBid}
-                    disabled={isBidding}
-                  >
-                    {isBidding ? 'Đang xử lý...' : 'Đặt Giá Thật (Blockchain)'}
-                  </button>
-                  
-                  <button 
-                    className={styles.buyBtn} 
-                    onClick={handleBuyNow}
-                    disabled={isBuying}
-                  >
-                    {isBuying ? 'Đang xử lý...' : `Mua Ngay (Ký giao dịch ${auction.currentPrice} SUI)`}
-                  </button>
+                  <div className={styles.bidMinNote}>
+                    Số dư khả dụng: <strong>{balance} SUI</strong>
+                  </div>
+                </div>
+
+                <button 
+                  className={styles.bidBtn}
+                  onClick={handleBid}
+                  disabled={isBidding}
+                >
+                  <Gavel size={20} />
+                  {isBidding ? 'ĐANG XỬ LÝ...' : 'ĐẶT GIÁ BLOCKCHAIN'}
+                </button>
+
+                <button 
+                  className={styles.buyBtn}
+                  onClick={handleBuyNow}
+                  disabled={isBuying}
+                >
+                  <Zap size={20} />
+                  {isBuying ? 'ĐANG XỬ LÝ...' : `MUA NGAY ${auction.currentPrice} SUI`}
+                </button>
+
+                <div className={styles.bidNote}>
+                  <ShieldCheck size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+                  Giao dịch an toàn và bảo mật trên SUI Network
                 </div>
               </div>
 
-              <div className={styles.meta}>
-                <div className={styles.metaItem}>
-                  <span className={styles.metaLabel}>Người bán:</span>
-                  <span className={styles.metaValue}>{auction.seller.name}</span>
-                </div>
-                <div className={styles.metaItem}>
-                  <span className={styles.metaLabel}>Thời gian kết thúc:</span>
-                  <span className={styles.metaValue}>{new Date(auction.endTime).toLocaleString('vi-VN')}</span>
+              <div className={styles.historyCard}>
+                <h2 className={styles.historyTitle}>
+                  <History size={18} /> Lịch sử đấu giá
+                </h2>
+                <div className={styles.historyList}>
+                  {currentAuctionBids.map((bid, index) => (
+                    <div key={bid.id} className={styles.historyItem}>
+                      <div className={`${styles.historyRank} ${index === 0 ? styles.historyRank1 : index === 1 ? styles.historyRank2 : index === 2 ? styles.historyRank3 : styles.historyRankDefault}`}>
+                        {index + 1}
+                      </div>
+                      <div className={styles.historyBidder}>
+                        <div className={styles.historyBidderName}>{bid.bidder.name}</div>
+                        <div className={styles.historyTime}>{bid.timestamp}</div>
+                      </div>
+                      <div className={styles.historyAmount}>{bid.amount} SUI</div>
+                    </div>
+                  ))}
+                  {currentAuctionBids.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>
+                      Chưa có lượt đặt giá nào.
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className={styles.history}>
-            <h2 className={styles.historyTitle}>Lịch sử đấu giá</h2>
-            <div className={styles.historyList}>
-              {mockBids.filter(b => b.auctionId === auction.id).map(bid => (
-                <div key={bid.id} className={styles.historyItem}>
-                  <div className={styles.historyUser}>{bid.bidder.name}</div>
-                  <div className={styles.historyTime}>{bid.timestamp}</div>
-                  <div className={styles.historyAmount}>{bid.amount} SUI</div>
-                </div>
-              ))}
-              {mockBids.filter(b => b.auctionId === auction.id).length === 0 && (
-                <div className={styles.emptyHistory}>Chưa có lượt đấu giá nào. Hãy là người đầu tiên!</div>
-              )}
             </div>
           </div>
         </div>
