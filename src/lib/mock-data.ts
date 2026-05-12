@@ -401,8 +401,8 @@ export const vipTiers: VipTier[] = [
     color: '#cd7f32',
     gradient: 'linear-gradient(135deg, #cd7f32 0%, #8B4513 100%)',
     glowColor: 'rgba(205, 127, 50, 0.4)',
-    priceMonthly: 10,
-    priceYearly: 100,
+    priceMonthly: 1,
+    priceYearly: 10,
     maxBidAmount: 1000,
     maxAuctions: 10,
     benefits: [
@@ -422,8 +422,8 @@ export const vipTiers: VipTier[] = [
     color: '#c0c0c0',
     gradient: 'linear-gradient(135deg, #c0c0c0 0%, #808080 100%)',
     glowColor: 'rgba(192, 192, 192, 0.4)',
-    priceMonthly: 30,
-    priceYearly: 300,
+    priceMonthly: 2,
+    priceYearly: 20,
     maxBidAmount: 5000,
     maxAuctions: 30,
     benefits: [
@@ -445,8 +445,8 @@ export const vipTiers: VipTier[] = [
     color: '#ffd700',
     gradient: 'linear-gradient(135deg, #ffd700 0%, #ff8c00 100%)',
     glowColor: 'rgba(255, 215, 0, 0.5)',
-    priceMonthly: 100,
-    priceYearly: 1000,
+    priceMonthly: 3,
+    priceYearly: 30,
     maxBidAmount: 999999,
     maxAuctions: 999,
     benefits: [
