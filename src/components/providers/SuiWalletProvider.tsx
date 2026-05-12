@@ -32,12 +32,12 @@ const queryClient = new QueryClient();
 
 export default function SuiWalletProvider({ children }: { children: React.ReactNode }) {
 	// Initialize network from localStorage if available, default to mainnet
-	const [defaultNetwork, setDefaultNetwork] = React.useState('mainnet');
+	const [defaultNetwork, setDefaultNetwork] = React.useState<'mainnet' | 'testnet' | 'devnet' | 'localnet'>('mainnet');
 
 	React.useEffect(() => {
 		const savedNetwork = localStorage.getItem('suiNetwork');
 		if (savedNetwork && (savedNetwork === 'mainnet' || savedNetwork === 'testnet' || savedNetwork === 'devnet' || savedNetwork === 'localnet')) {
-			setDefaultNetwork(savedNetwork);
+			setDefaultNetwork(savedNetwork as 'mainnet' | 'testnet' | 'devnet' | 'localnet');
 		}
 	}, []);
 

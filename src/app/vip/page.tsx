@@ -41,8 +41,8 @@ export default function VipPage() {
     try {
       const txb = new Transaction();
       // Use txb.pure(0, 'u64') which is more compatible across SDK versions
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure(0, 'u64')]); 
-      txb.transferObjects([coin], txb.pure(account.address, 'address'));
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(0)]); 
+      txb.transferObjects([coin], txb.pure.address(account.address));
       
       signAndExecuteTransaction(
         {
