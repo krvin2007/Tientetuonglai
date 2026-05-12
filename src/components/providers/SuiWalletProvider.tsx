@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { createNetworkConfig, SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -31,15 +31,18 @@ const { networkConfig } = createNetworkConfig({
 const queryClient = new QueryClient();
 
 export default function SuiWalletProvider({ children }: { children: React.ReactNode }) {
-	// Initialize network from localStorage if available, default to mainnet
-	const [defaultNetwork, setDefaultNetwork] = React.useState<'mainnet' | 'testnet' | 'devnet' | 'localnet'>('mainnet');
+	const [defaultNetwork, setDefaultNetwork] = useState<'mainnet' | 'testnet' | 'devnet' | 'localnet'>('mainnet');
+	const [mounted, setMounted] = useState(false);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		const savedNetwork = localStorage.getItem('suiNetwork');
 		if (savedNetwork && (savedNetwork === 'mainnet' || savedNetwork === 'testnet' || savedNetwork === 'devnet' || savedNetwork === 'localnet')) {
 			setDefaultNetwork(savedNetwork as 'mainnet' | 'testnet' | 'devnet' | 'localnet');
 		}
+		setMounted(true);
 	}, []);
+
+	if (!mounted) return null;
 
 	return (
 		<QueryClientProvider client={queryClient}>

@@ -1,5 +1,4 @@
 'use client';
-// @ts-nocheck
 
 import { useState } from 'react';
 import { Check, X, Zap, Crown } from 'lucide-react';
@@ -20,12 +19,19 @@ export default function VipPage() {
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
   const handleUpgrade = (tierId: 'dong' | 'bac' | 'vang', price: number) => {
+    console.log(`Starting upgrade to ${tierId} for ${price} SUI`);
+    
     if (!account) {
       alert('Vui lòng kết nối ví SUI để nâng cấp VIP!');
       return;
     }
 
-    const userBalance = Number(balance.replace(/,/g, ''));
+    // Parse balance safely
+    const cleanBalance = balance.replace(/,/g, '');
+    const userBalance = Number(cleanBalance);
+    
+    console.log(`Current Balance: ${userBalance}, Price: ${price}`);
+
     if (userBalance < price) {
       alert(`Số dư không đủ! Bạn cần ${price} SUI để nâng cấp nhưng ví chỉ có ${balance} SUI.\n\nLưu ý: Hãy kiểm tra xem bạn đã chọn đúng mạng (Mainnet/Testnet) trong ví chưa nhé!`);
       return;
@@ -40,10 +46,14 @@ export default function VipPage() {
     
     try {
       const txb = new Transaction();
-      // Use txb.pure(0, 'u64') which is more compatible across SDK versions
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(0)]); 
+      
+      // For demo purposes, we do a small self-transfer to prove ownership and signature
+      // In a production app, this would be a MoveCall to a VIP contract
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(1000)]); // 1000 MIST = 0.000001 SUI
       txb.transferObjects([coin], txb.pure.address(account.address));
       
+      console.log('Executing transaction...');
+
       signAndExecuteTransaction(
         {
           transaction: txb as any,
@@ -63,10 +73,10 @@ export default function VipPage() {
           },
         }
       );
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Catch error:', err);
       setIsUpgrading(null);
-      alert('Có lỗi xảy ra khi tạo giao dịch.');
+      alert(`Có lỗi xảy ra khi tạo giao dịch: ${err.message || 'Lỗi không xác định'}`);
     }
   };
 
