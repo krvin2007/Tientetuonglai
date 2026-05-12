@@ -10,6 +10,8 @@ import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-ki
 import { Transaction } from '@mysten/sui/transactions';
 import styles from './page.module.css';
 
+const VAULT_ADDRESS = '0x8979147e4c9f1390494df9f87f54c25a07c30a4306e987c6f0592945d8b7b252';
+
 export default function VipPage() {
   const [isYearly, setIsYearly] = useState(false);
   const { vipTier, upgradeVip, balance, network } = useUser();
@@ -47,11 +49,13 @@ export default function VipPage() {
     try {
       const txb = new Transaction();
       
-      // For demo purposes, we do a small self-transfer to prove ownership and signature
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(1000)]); // 1000 MIST = 0.000001 SUI
-      txb.transferObjects([coin], txb.pure.address(account.address));
+      // Calculate MIST (1 SUI = 10^9 MIST)
+      const mistAmount = BigInt(Math.floor(price * 1_000_000_000));
       
-      console.log('Executing transaction...');
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(mistAmount)]);
+      txb.transferObjects([coin], txb.pure.address(VAULT_ADDRESS));
+      
+      console.log('Executing transaction for ' + price + ' SUI...');
 
       signAndExecuteTransaction(
         {

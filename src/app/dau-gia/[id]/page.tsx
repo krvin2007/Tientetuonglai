@@ -10,6 +10,8 @@ import { Transaction } from '@mysten/sui/transactions';
 import { useUser } from '@/components/providers/UserProvider';
 import styles from './page.module.css';
 
+const VAULT_ADDRESS = '0x8979147e4c9f1390494df9f87f54c25a07c30a4306e987c6f0592945d8b7b252';
+
 export default function AuctionDetailPage() {
   const { id } = useParams();
   const account = useCurrentAccount();
@@ -42,9 +44,12 @@ export default function AuctionDetailPage() {
     setIsBidding(true);
     try {
       const txb = new Transaction();
-      // Real transaction logic for demo: self transfer of a small amount
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(1000)]); 
-      txb.transferObjects([coin], txb.pure.address(account.address));
+      // Calculate MIST (1 SUI = 10^9 MIST)
+      const mistAmount = BigInt(Math.floor(amount * 1_000_000_000));
+      
+      // Split the amount from gas and transfer to vault
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(mistAmount)]); 
+      txb.transferObjects([coin], txb.pure.address(VAULT_ADDRESS));
 
       signAndExecuteTransaction(
         {
@@ -85,9 +90,11 @@ export default function AuctionDetailPage() {
     setIsBuying(true);
     try {
       const txb = new Transaction();
-      // Buy Now demo: Transfer 0.01 SUI as a "payment" (to self for demo)
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(10000000)]); // 0.01 SUI
-      txb.transferObjects([coin], txb.pure.address(account.address));
+      // Buy Now: Transfer the current price in SUI to the vault
+      const mistAmount = BigInt(Math.floor(auction.currentPrice * 1_000_000_000));
+      
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(mistAmount)]);
+      txb.transferObjects([coin], txb.pure.address(VAULT_ADDRESS));
 
       signAndExecuteTransaction(
         {
