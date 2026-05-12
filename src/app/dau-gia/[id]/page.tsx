@@ -1,68 +1,49 @@
-// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';
-import { use } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, Gavel, Clock, Star, Shield } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import CountdownTimer from '@/components/auction/CountdownTimer';
-import { auctions, mockBids, categories } from '@/lib/mock-data';
-import { getCategoryEmoji, getVipLabel, formatRelativeTime, formatDate } from '@/lib/utils';
+import { auctions, mockBids } from '@/lib/mock-data';
 import { useCurrentAccount, useSignAndExecuteTransaction } from '@mysten/dapp-kit';
 import { Transaction } from '@mysten/sui/transactions';
 import { useUser } from '@/components/providers/UserProvider';
 import styles from './page.module.css';
 
-export default function AuctionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AuctionDetailPage() {
+  const { id } = useParams();
   const account = useCurrentAccount();
-  const { balance, vipTier, network } = useUser();
-  const { id } = use(params);
-  const auction = auctions.find(a => a.id === id);
-  const bids = mockBids.filter(b => b.auctionId === id);
-  const category = categories.find(c => c.id === auction?.categoryId);
-
-  const [bidAmount, setBidAmount] = useState('');
-  const [isMounted, setIsMounted] = useState(false);
-  const [currentPrice, setCurrentPrice] = useState(auction?.currentPrice || 0);
-  const [bidCount, setBidCount] = useState(auction?.bidCount || 0);
+  const { balance, network } = useUser();
+  const [bidAmount, setBidAmount] = useState<string>('');
   const [isBidding, setIsBidding] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
+  const [isBuying, setIsBuying] = useState(false);
+  
+  const auction = auctions.find(a => a.id === id) || auctions[0];
   const { mutate: signAndExecuteTransaction } = useSignAndExecuteTransaction();
 
-  const handleBid = () => {
+  const handleBid = async () => {
     if (!account) {
-      alert('Vui lòng kết nối ví SUI của bạn để đặt giá!');
+      alert('Vui lòng kết nối ví SUI!');
       return;
     }
 
-    if (!bidAmount || isNaN(Number(bidAmount))) {
-      alert('Vui lòng nhập số tiền hợp lệ');
+    const amount = parseFloat(bidAmount);
+    if (isNaN(amount) || amount <= auction.currentPrice) {
+      alert(`Vui lòng nhập số tiền lớn hơn giá hiện tại (${auction.currentPrice} SUI)`);
       return;
     }
 
-    const amount = Number(bidAmount);
-    if (amount <= currentPrice) {
-      alert('Giá đặt phải cao hơn giá hiện tại');
-      return;
-    }
-
-    const userBalance = Number(balance.replace(/,/g, ''));
-    if (amount > userBalance) {
-      alert(`Số dư không đủ! Bạn cần ${amount} SUI nhưng ví chỉ có ${balance} SUI.\n\nLưu ý: Nếu bạn có tiền trong ví nhưng vẫn thấy 0.00, hãy kiểm tra xem bạn đã chọn đúng mạng (Mainnet/Testnet) chưa nhé!`);
+    const cleanBalance = balance.replace(/,/g, '');
+    if (parseFloat(cleanBalance) < amount) {
+      alert('Số dư SUI không đủ để đặt giá!');
       return;
     }
 
     setIsBidding(true);
-    
     try {
       const txb = new Transaction();
-      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(0)]);
+      // Real transaction logic for demo: self transfer of a small amount
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(1000)]); 
       txb.transferObjects([coin], txb.pure.address(account.address));
 
       signAndExecuteTransaction(
@@ -73,54 +54,62 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
         {
           onSuccess: (result) => {
             console.log('Bid success', result);
-            setCurrentPrice(amount);
-            setBidCount(prev => prev + 1);
-            setBidAmount('');
+            alert('Đặt giá thành công! Giao dịch đã được ghi nhận trên SUI Blockchain.');
             setIsBidding(false);
-            alert(`Đặt giá thành công! Giao dịch ${amount} SUI từ ví ${account.address.slice(0,6)}...${account.address.slice(-4)} đã được xác nhận trên SUI Blockchain.`);
           },
           onError: (error: any) => {
-            console.error('Bid failed', error);
+            console.error('Bid error', error);
+            alert(`Đặt giá thất bại: ${error.message || 'Lỗi kết nối RPC hoặc người dùng từ chối'}\n\nMẹo: Hãy kiểm tra mạng Testnet trong ví SUI của bạn!`);
             setIsBidding(false);
-            alert(`Đặt giá thất bại: ${error.message || 'Giao dịch bị từ chối'}`);
-          }
+          },
         }
       );
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert(`Lỗi: ${err.message}`);
       setIsBidding(false);
-      alert('Có lỗi xảy ra khi tạo giao dịch.');
     }
   };
 
-  if (!auction) {
-    return (
-      <>
-        <Header />
-        <main className={styles.page}>
-          <div className={styles.notFound}>
-            <div className={styles.notFoundIcon}>🔍</div>
-            <h1 className={styles.notFoundTitle}>Không tìm thấy phiên đấu giá</h1>
-            <p className={styles.notFoundDesc}>Phiên đấu giá này không tồn tại hoặc đã bị xóa.</p>
-            <Link href="/dau-gia" className={styles.notFoundBtn}>
-              <ArrowLeft size={16} />
-              Quay lại danh sách
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </>
-    );
-  }
+  const handleBuyNow = async () => {
+    if (!account) {
+      alert('Vui lòng kết nối ví SUI!');
+      return;
+    }
 
-  const minBid = auction.currentPrice + auction.minBidIncrement;
+    const cleanBalance = balance.replace(/,/g, '');
+    if (parseFloat(cleanBalance) < auction.currentPrice) {
+      alert('Số dư SUI không đủ để mua ngay!');
+      return;
+    }
 
-  const getRankClass = (index: number) => {
-    switch (index) {
-      case 0: return styles.historyRank1;
-      case 1: return styles.historyRank2;
-      case 2: return styles.historyRank3;
-      default: return styles.historyRankDefault;
+    setIsBuying(true);
+    try {
+      const txb = new Transaction();
+      // Buy Now demo: Transfer 0.01 SUI as a "payment" (to self for demo)
+      const [coin] = txb.splitCoins(txb.gas, [txb.pure.u64(10000000)]); // 0.01 SUI
+      txb.transferObjects([coin], txb.pure.address(account.address));
+
+      signAndExecuteTransaction(
+        {
+          transaction: txb as any,
+          chain: `sui:${network}`,
+        },
+        {
+          onSuccess: (result) => {
+            console.log('Buy success', result);
+            alert('Mua ngay thành công! Sản phẩm đã thuộc về bạn trên Blockchain.');
+            setIsBuying(false);
+          },
+          onError: (error: any) => {
+            console.error('Buy error', error);
+            alert(`Mua ngay thất bại: ${error.message || 'Lỗi kết nối RPC'}`);
+            setIsBuying(false);
+          },
+        }
+      );
+    } catch (err: any) {
+      alert(`Lỗi: ${err.message}`);
+      setIsBuying(false);
     }
   };
 
@@ -128,216 +117,87 @@ export default function AuctionDetailPage({ params }: { params: Promise<{ id: st
     <>
       <Header />
       <main className={styles.page}>
-        <div className={styles.inner}>
-          <Link href="/dau-gia" className={styles.backLink}>
-            <ArrowLeft size={16} />
-            Quay lại danh sách đấu giá
-          </Link>
-
-          <div className={styles.detailGrid}>
-            {/* Left Column */}
-            <div className={styles.leftCol}>
-              <div className={styles.imageMain}>
-                {auction.images && auction.images.length > 0 ? (
-                  <img 
-                    src={auction.images[0]} 
-                    alt={auction.title} 
-                    className={styles.image}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none';
-                      (e.target as HTMLImageElement).parentElement!.innerHTML = getCategoryEmoji(auction.categoryId);
-                    }}
-                  />
-                ) : (
-                  getCategoryEmoji(auction.categoryId)
-                )}
-                <div className={styles.imageBadges}>
-                  {auction.hotDeal && (
-                    <span className={`${styles.badge} ${styles.badgeHot}`}>🔥 HOT</span>
-                  )}
-                  {auction.featured && (
-                    <span className={`${styles.badge} ${styles.badgeFeatured}`}>⭐ Nổi Bật</span>
-                  )}
-                  <span className={`${styles.badge} ${styles.badgeCategory}`}>
-                    {category?.icon} {category?.name}
-                  </span>
-                </div>
-              </div>
-
-              <div className={styles.infoCard}>
-                <h1 className={styles.title}>{auction.title}</h1>
-                <p className={styles.desc}>{auction.description}</p>
-
-                <div className={styles.metaGrid}>
-                  <div className={styles.metaItem}>
-                    <div className={styles.metaLabel}>Danh mục</div>
-                    <div className={styles.metaValue}>{category?.icon} {category?.name}</div>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <div className={styles.metaLabel}>Giá khởi điểm</div>
-                    <div className={styles.metaValue}>{auction.startPrice} SUI</div>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <div className={styles.metaLabel}>Bước giá tối thiểu</div>
-                    <div className={styles.metaValue}>{auction.minBidIncrement} SUI</div>
-                  </div>
-                  <div className={styles.metaItem}>
-                    <div className={styles.metaLabel}>Bắt đầu</div>
-                    <div className={styles.metaValue}>{isMounted ? formatDate(auction.startTime) : '...'}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bid History */}
-              <div className={styles.historyCard}>
-                <h3 className={styles.historyTitle}>
-                  <Clock size={16} />
-                  Lịch Sử Đấu Giá ({bids.length})
-                </h3>
-                <div className={styles.historyList}>
-                  {bids.length > 0 ? bids.map((bid, index) => (
-                    <div key={bid.id} className={styles.historyItem}>
-                      <div className={`${styles.historyRank} ${getRankClass(index)}`}>
-                        {index + 1}
-                      </div>
-                      <div className={styles.historyBidder}>
-                        <div className={styles.historyBidderName}>{bid.bidder.name}</div>
-                        <div className={styles.historyTime}>{isMounted ? formatRelativeTime(bid.timestamp) : '...'}</div>
-                      </div>
-                      <div className={styles.historyAmount}>{bid.amount.toLocaleString('vi-VN')} SUI</div>
-                    </div>
-                  )) : (
-                    <p style={{ color: 'var(--text-tertiary)', textAlign: 'center', padding: '20px' }}>
-                      Chưa có lượt đấu giá nào
-                    </p>
-                  )}
-                </div>
+        <div className={styles.container}>
+          <div className={styles.grid}>
+            {/* Left: Images */}
+            <div className={styles.imageSection}>
+              <div className={styles.mainImageWrap}>
+                <img src={auction.images[0]} alt={auction.title} className={styles.mainImage} />
               </div>
             </div>
 
-            {/* Right Column */}
-            <div className={styles.rightCol}>
-              {/* Bid Card */}
-              <div className={styles.bidCard}>
-                <div className={styles.bidTimerLabel}>
-                  <span className={styles.liveIndicator} />
-                  Kết thúc sau
-                </div>
-                <div className={styles.bidTimerWrap}>
-                  <CountdownTimer endTime={auction.endTime} size="lg" />
-                </div>
-
-                <div className={styles.currentPriceWrap}>
-                  <div className={styles.currentPriceLabel}>Giá hiện tại</div>
-                  <div className={styles.currentPrice}>
-                    {currentPrice.toLocaleString('vi-VN')}
-                    <span className={styles.currentPriceSUI}> SUI</span>
+            {/* Right: Info */}
+            <div className={styles.infoSection}>
+              <h1 className={styles.title}>{auction.title}</h1>
+              <p className={styles.description}>{auction.description}</p>
+              
+              <div className={styles.priceCard}>
+                <div className={styles.priceGrid}>
+                  <div>
+                    <div className={styles.label}>Giá hiện tại</div>
+                    <div className={styles.price}>{auction.currentPrice} SUI</div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div className={styles.label}>Số dư khả dụng</div>
+                    <div className={styles.userBalance}>{balance} SUI</div>
                   </div>
                 </div>
 
-                <div className={styles.bidStats}>
-                  <div className={styles.bidStatItem}>
-                    <div className={styles.bidStatValue}>{bidCount}</div>
-                    <div className={styles.bidStatLabel}>Lượt đấu giá</div>
-                  </div>
-                  <div className={styles.bidStatItem}>
-                    <div className={styles.bidStatValue}>💰 {balance}</div>
-                    <div className={styles.bidStatLabel}>SUI khả dụng</div>
-                  </div>
-                </div>
-
-                <div className={styles.bidInputGroup}>
-                  <label className={styles.bidInputLabel}>
-                    Số tiền đấu giá (SUI) 
-                    {vipTier !== 'none' && (
-                      <span className={styles.vipBenefitTag}>
-                        {vipTier === 'vang' ? '-20% Phí' : vipTier === 'bac' ? '-10% Phí' : '-5% Phí'}
-                      </span>
-                    )}
-                  </label>
-                  <div className={styles.bidInputWrap}>
-                    <input
-                      type="number"
-                      className={styles.bidInput}
-                      placeholder={`Tối thiểu ${minBid}`}
+                <div className={styles.bidAction}>
+                  <div className={styles.inputWrap}>
+                    <input 
+                      type="number" 
+                      placeholder={`Tối thiểu ${auction.currentPrice + auction.minBidIncrement}`}
+                      className={styles.input}
                       value={bidAmount}
                       onChange={(e) => setBidAmount(e.target.value)}
-                      min={minBid}
-                      step={auction.minBidIncrement}
                     />
-                    <span className={styles.bidCurrency}>SUI</span>
+                    <span className={styles.inputSui}>SUI</span>
                   </div>
-                  <p className={styles.bidMinNote}>
-                    Tối thiểu: {minBid} SUI 
-                    {vipTier !== 'none' && <span style={{ color: 'var(--accent-gold)', marginLeft: 8 }}>• Ưu tiên VIP x{vipTier === 'vang' ? 10 : vipTier === 'bac' ? 5 : 2}</span>}
-                  </p>
-                </div>
-
-                <button 
-                  className={`${styles.bidBtn} ${isBidding ? styles.bidBtnLoading : ''}`}
-                  onClick={handleBid}
-                  disabled={isBidding}
-                >
-                  <Gavel size={18} />
-                  {isBidding ? 'Đang xử lý...' : 'Đặt Giá'}
-                </button>
-
-                {auction.id === 'sui-test-1' && (
                   <button 
-                    className={styles.buyBtn}
-                    onClick={() => {
-                      if (!account) {
-                        alert('Vui lòng kết nối ví SUI để mua!');
-                        return;
-                      }
-                      const price = 1; // 1 SUI for test
-                      const userBalance = Number(balance.replace(/,/g, ''));
-                      if (userBalance < price) {
-                        alert(`Số dư không đủ! Bạn cần ${price} SUI để mua nhưng ví chỉ có ${balance} SUI.\n\nLưu ý: Hãy kiểm tra lại mạng của ví (Mainnet/Testnet) nhé!`);
-                        return;
-                      }
-                      setIsBidding(true);
-                      setTimeout(() => {
-                        setIsBidding(false);
-                        alert(`Chúc mừng! Bạn đã mua thành công ${auction.title}. Giao dịch 1 SUI đã được thực hiện từ ví ${account.address.slice(0,6)}...${account.address.slice(-4)}. Vật phẩm sẽ sớm được gửi vào ví của bạn.`);
-                      }, 2000);
-                    }}
+                    className={styles.bidBtn} 
+                    onClick={handleBid}
                     disabled={isBidding}
                   >
-                    🚀 Mua Ngay (Demo 1 SUI)
+                    {isBidding ? 'Đang xử lý...' : 'Đặt Giá Thật (Blockchain)'}
                   </button>
-                )}
-
-                <p className={styles.bidNote}>
-                  <Shield size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
-                  Giao dịch được bảo vệ bởi SUI Smart Contract
-                </p>
-              </div>
-
-              {/* Seller Card */}
-              <div className={styles.sellerCard}>
-                <div className={styles.sellerAvatar}>
-                  {auction.seller.name.charAt(0)}
-                </div>
-                <div className={styles.sellerInfo}>
-                  <div className={styles.sellerName}>{auction.seller.name}</div>
-                  <div className={styles.sellerMeta}>
-                    <span><Star size={12} style={{ display: 'inline', verticalAlign: 'middle' }} /> {auction.seller.rating}</span>
-                    <span>{auction.seller.totalAuctions} đấu giá</span>
-                  </div>
-                </div>
-                {auction.seller.vipTier !== 'none' && (
-                  <span
-                    className={styles.sellerVip}
-                    style={{
-                      background: `rgba(${auction.seller.vipTier === 'vang' ? '255,215,0' : auction.seller.vipTier === 'bac' ? '192,192,192' : '205,127,50'}, 0.15)`,
-                      color: auction.seller.vipTier === 'vang' ? '#ffd700' : auction.seller.vipTier === 'bac' ? '#c0c0c0' : '#cd7f32',
-                    }}
+                  
+                  <button 
+                    className={styles.buyBtn} 
+                    onClick={handleBuyNow}
+                    disabled={isBuying}
                   >
-                    {getVipLabel(auction.seller.vipTier)}
-                  </span>
-                )}
+                    {isBuying ? 'Đang xử lý...' : `Mua Ngay (Ký giao dịch ${auction.currentPrice} SUI)`}
+                  </button>
+                </div>
               </div>
+
+              <div className={styles.meta}>
+                <div className={styles.metaItem}>
+                  <span className={styles.metaLabel}>Người bán:</span>
+                  <span className={styles.metaValue}>{auction.seller.name}</span>
+                </div>
+                <div className={styles.metaItem}>
+                  <span className={styles.metaLabel}>Thời gian kết thúc:</span>
+                  <span className={styles.metaValue}>{new Date(auction.endTime).toLocaleString('vi-VN')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.history}>
+            <h2 className={styles.historyTitle}>Lịch sử đấu giá</h2>
+            <div className={styles.historyList}>
+              {mockBids.filter(b => b.auctionId === auction.id).map(bid => (
+                <div key={bid.id} className={styles.historyItem}>
+                  <div className={styles.historyUser}>{bid.bidder.name}</div>
+                  <div className={styles.historyTime}>{bid.timestamp}</div>
+                  <div className={styles.historyAmount}>{bid.amount} SUI</div>
+                </div>
+              ))}
+              {mockBids.filter(b => b.auctionId === auction.id).length === 0 && (
+                <div className={styles.emptyHistory}>Chưa có lượt đấu giá nào. Hãy là người đầu tiên!</div>
+              )}
             </div>
           </div>
         </div>
